@@ -1,0 +1,6 @@
+main_vpc_cidr = "10.0.0.0/22"
+ public_subnets = "10.0.0.0/24"
+ public_subnets2 = "10.0.1.0/24"
+ private_subnets = "10.0.2.0/24"
+ private_subnets2 = "10.0.3.0/24"
+ region = "us-east-2"
