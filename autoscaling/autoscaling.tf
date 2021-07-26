@@ -17,7 +17,7 @@ resource "aws_autoscaling_group" "group" {
   launch_configuration = aws_launch_configuration.aws-config.name
   min_size             = 1
   max_size             = 1
-  vpc_zone_identifier  = var.publicSubnets
+  vpc_zone_identifier  = var.subnets
 
   lifecycle {
     create_before_destroy = true
@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "group" {
 
   tag {
     key = "Name"
-    value = "Apche-instance"
+    value = var.instance_name
     propagate_at_launch = true
   }
 }
