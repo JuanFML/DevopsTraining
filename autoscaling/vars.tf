@@ -17,6 +17,6 @@ variable "internal-load-balancer"{
 variable "instance-port"{
   description = "port of the instance for the load balancer"
 }
-variable "instance_name" {
+variable "instance-name" {
   description = "name of the instance"
 }

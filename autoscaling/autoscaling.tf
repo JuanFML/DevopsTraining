@@ -25,7 +25,7 @@ resource "aws_autoscaling_group" "group" {
 
   tag {
     key = "Name"
-    value = var.instance_name
+    value = var.instance-name
     propagate_at_launch = true
   }
 }
