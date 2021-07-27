@@ -4,7 +4,7 @@
 # sudo apt-get install -y nodejs
 # sudo npm install npm@latest -g
 # git clone https://github.com/Isheros/back-test.git
-# cd baxk-test
+# cd back-test
 # npm install
 # npm run start
 
