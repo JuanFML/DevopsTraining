@@ -15,14 +15,10 @@ data "aws_ami" "ubuntu" {
 module "vpc_2n2" {
   source        = "./vpc"
   main_vpc_cidr = "10.0.0.0/22"
-  publicSubnets = {
-    public1 = "10.0.0.0/24",
-    public2 = "10.0.1.0/24",
-  }
-  privateSubnets = {
-    private1 = "10.0.2.0/24",
-    private2 = "10.0.3.0/24"
-  }
+  publicSubnets = ["10.0.0.0/24","10.0.1.0/24"]
+  
+  privateSubnets = [ "10.0.2.0/24", "10.0.3.0/24"]
+  az = ["us-east-2a", "us-east-2b"]
 }
 
 module "auto-scaling-public" {

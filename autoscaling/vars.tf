@@ -8,6 +8,7 @@ variable "user_data64_file" {
 variable "subnets" {
   description = "All the public subnets"
 }
+
 variable "main_vpc_id" {
   description = "Id of the main vpc"
 }

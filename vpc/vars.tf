@@ -7,3 +7,7 @@ variable "publicSubnets" {
 variable "privateSubnets" {
   description = "map of private subnets with the cidr block. Name shoould be private{subnet number}"
 }
+
+variable "az" {
+  description = "Availability zones for the subnets"
+}

@@ -1,5 +1,5 @@
 resource "aws_launch_configuration" "config-autoscale-group" {
-  name_prefix   = "config-autoscale-group"
+  name_prefix   = "config-autoscale-group${var.instance-name}"
   image_id      = var.AMI_id
   instance_type = "t2.micro"
   user_data_base64 = "${filebase64(var.user_data64_file)}"
@@ -13,7 +13,7 @@ resource "aws_launch_configuration" "config-autoscale-group" {
 }
 
 resource "aws_autoscaling_group" "group" {
-  name                 = "terraform-autoscale-group"
+  name                 = "terraform-autoscale-group${var.instance-name}"
   launch_configuration = aws_launch_configuration.config-autoscale-group.name
   min_size             = 1
   max_size             = 1
