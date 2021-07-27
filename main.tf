@@ -16,7 +16,6 @@ module "vpc_2n2" {
   source        = "./vpc"
   main_vpc_cidr = "10.0.0.0/22"
   publicSubnets = ["10.0.0.0/24","10.0.1.0/24"]
-  
   privateSubnets = [ "10.0.2.0/24", "10.0.3.0/24"]
   az = ["us-east-2a", "us-east-2b"]
 }
@@ -30,6 +29,7 @@ module "auto-scaling-public" {
   internal-load-balancer = false
   instance-name    = "frontend"
   instance-port    = 3000
+  public-ip = true
 }
 
 module "auto-scaling-private" {
@@ -40,5 +40,6 @@ module "auto-scaling-private" {
   main_vpc_id = module.vpc_2n2.main_vpc_id
   internal-load-balancer = true
   instance-name    = "backend"
-  instance-port    = 80
+  instance-port    = 8080
+  public-ip = false
 }

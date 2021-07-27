@@ -17,7 +17,7 @@ resource "aws_subnet" "publicSubnets" {
   # for_each   = var.publicSubnets
   cidr_block = var.publicSubnets[count.index]
   availability_zone =  var.az[count.index]
-  
+
   tags = {
     Name = "public${count.index}"
   }
@@ -30,7 +30,6 @@ resource "aws_subnet" "privateSubnets" {
   # for_each   = var.privateSubnets
   cidr_block = var.privateSubnets[count.index]
   availability_zone =  var.az[count.index]
-  
   tags = {
     Name = "private${count.index}"
   }

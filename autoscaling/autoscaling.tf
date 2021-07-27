@@ -4,7 +4,7 @@ resource "aws_launch_configuration" "config-autoscale-group" {
   instance_type = "t2.micro"
   user_data_base64 = "${filebase64(var.user_data64_file)}"
   security_groups = ["${aws_security_group.Allow-http-ssh.id}"]
-  associate_public_ip_address = true
+  associate_public_ip_address = var.public-ip
   key_name = "first-key-pair"
 
   lifecycle {
