@@ -18,7 +18,7 @@ resource "aws_autoscaling_group" "group" {
   min_size             = 1
   max_size             = 1
   vpc_zone_identifier  = var.subnets
-
+  load_balancers = ["${aws_elb.loadbalancer.name}"]
   lifecycle {
     create_before_destroy = true
   }
