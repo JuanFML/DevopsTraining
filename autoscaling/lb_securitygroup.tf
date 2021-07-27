@@ -1,5 +1,5 @@
-resource "aws_security_group" "loadbalancer" {
-  name = "laodbalancer-security-group"
+resource "aws_security_group" "Allow-http" {
+  name = "Allow-http-${var.instance-name}"
   vpc_id      = var.main_vpc_id
 
 

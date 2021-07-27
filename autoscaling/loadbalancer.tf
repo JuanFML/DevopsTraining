@@ -1,7 +1,7 @@
-resource "aws_elb" "loadbalancer" {
-  name               = "autoscale-lb"
+resource "aws_elb" "classic-lb-http" {
+  name               = "classic-lb-http-${var.instance-name}"
   internal           = var.internal-load-balancer
-  security_groups    = ["${aws_security_group.loadbalancer.id}"]
+  security_groups    = ["${aws_security_group.Allow-http.id}"]
   subnets            = var.subnets
 
   listener {
@@ -21,6 +21,6 @@ resource "aws_elb" "loadbalancer" {
   connection_draining   = true
 
   tags = {
-    Name = "classic-lb-http"
+    Name = "classic-lb-http-${var.instance-name}"
   }
 }

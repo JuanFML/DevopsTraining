@@ -36,13 +36,13 @@ module "auto-scaling-public" {
   instance-port    = 3000
 }
 
-# module "auto-scaling-private" {
-#   source         = "./autoscaling"
-#   AMI_id         = data.aws_ami.ubuntu.id
-#   user_data64_file = "install_back.sh"
-#   subnets = module.vpc_2n2.privateSubnets_ids
-#   main_vpc_id = module.vpc_2n2.main_vpc_id
-#   internal-load-balancer = true
-#   instance-name    = "backend"
-#   instance-port    = 9000
-# }
+module "auto-scaling-private" {
+  source         = "./autoscaling"
+  AMI_id         = data.aws_ami.ubuntu.id
+  user_data64_file = "install_back.sh"
+  subnets = module.vpc_2n2.privateSubnets_ids
+  main_vpc_id = module.vpc_2n2.main_vpc_id
+  internal-load-balancer = true
+  instance-name    = "backend"
+  instance-port    = 80
+}

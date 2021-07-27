@@ -1,5 +1,5 @@
-resource "aws_security_group" "autoscale" {
-  name = "terraform-tcp-security-group"
+resource "aws_security_group" "Allow-http-ssh" {
+  name = "Allow-http-ssh-${var.instance-name}"
   vpc_id      = var.main_vpc_id
 
   ingress {
