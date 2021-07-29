@@ -3,7 +3,7 @@ resource "aws_launch_configuration" "config-autoscale-group" {
   image_id      = var.AMI_id
   instance_type = "t2.micro"
   user_data_base64 = "${filebase64(var.user_data64_file)}"
-  security_groups = ["${aws_security_group.Allow-http-ssh.id}"]
+  security_groups = ["${var.security-group}"]
   associate_public_ip_address = var.public-ip
   key_name = "first-key-pair"
 
@@ -18,7 +18,6 @@ resource "aws_autoscaling_group" "group" {
   min_size             = 1
   max_size             = 1
   vpc_zone_identifier  = var.subnets
-  # load_balancers = ["${aws_elb.classic-lb-http.name}"]
   target_group_arns = [aws_lb_target_group.lb-target-group.arn]
 
   lifecycle {

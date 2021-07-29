@@ -23,3 +23,9 @@ variable "instance-port"{
 variable "instance-name" {
   description = "name of the instance"
 }
+variable "security-group" {
+  description = "security-group"
+}
+variable "lb-security-group" {
+  description = "lb-security-group"
+}
