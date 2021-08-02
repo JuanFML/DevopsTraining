@@ -44,14 +44,14 @@ resource "aws_lb_target_group" "lb-target-group" {
   protocol = "TCP"
   vpc_id   = var.main_vpc_id
   target_type = "instance"
-    health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 3
-    path              = "/"
-    interval            = 30
-    port = "${var.instance-port}"
-  }
+  #   health_check {
+  #   healthy_threshold   = 2
+  #   unhealthy_threshold = 2
+  #   timeout             = 3
+  #   path              = "/"
+  #   interval            = 30
+  #   port = "${var.instance-port}"
+  # }
   lifecycle {
     create_before_destroy = true
   }
