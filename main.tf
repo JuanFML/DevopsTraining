@@ -89,6 +89,14 @@ module "security-group-frontend" {
     security_groups =[]
     description = "App access through http"
   },
+   "ssh" = {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
+    description = "SSH host access"
+  }
   }
 }
 
@@ -128,6 +136,14 @@ module "security-group-backend" {
     security_groups =[]
     description = "App access through http"
   }
+   "ssh" = {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
+    description = "Bastion host access"
+  }
   }
 }
 
@@ -153,22 +169,23 @@ module "security-group-bastion" {
   security-group-lb-name   = "Bastion-LB"
   instance-port    = 80
   ingress-configs = {
- "ssh" = {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    security_groups =[]
-    description = "Bastion host access"
-  }}
+    "ssh" = {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      security_groups = []
+      description = "Bastion SSH autoscaling access"
+    }
+  }
   ingress-lb-configs={
     "ssh" = {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    security_groups =[]
-    description = "App access through http"
-  }
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      security_groups = []
+      description = "Bastion SSH LB access"
+    }
   }
 }

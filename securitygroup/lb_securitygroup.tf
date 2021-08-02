@@ -2,13 +2,6 @@ resource "aws_security_group" "Allow-http" {
   name = "${var.security-group-lb-name}"
   vpc_id      = var.main_vpc_id
 
-  # ingress {
-  #   from_port   = var.instance-port
-  #   to_port     = var.instance-port
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
-
   dynamic "ingress" {
     for_each = var.ingress-lb-configs
     content {

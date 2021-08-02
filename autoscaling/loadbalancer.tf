@@ -1,4 +1,4 @@
-resource "aws_lb" "Applicatiom-loadbalancer" {
+resource "aws_lb" "Application-LB" {
   name               = "Application-lb-${var.instance-name}"
   internal           = var.internal-load-balancer
   load_balancer_type = "application"
@@ -8,8 +8,8 @@ resource "aws_lb" "Applicatiom-loadbalancer" {
     Name = "Application-lb-${var.instance-name}"
   }
 }
-resource "aws_lb" "Network-loadbalancer" {
-  name               = "Netowrk-lb-${var.instance-name}"
+resource "aws_lb" "Network-LB" {
+  name               = "Network-lb-${var.instance-name}"
   internal           = var.internal-load-balancer
   load_balancer_type = "network"
   subnets            = var.subnets
@@ -19,17 +19,17 @@ resource "aws_lb" "Network-loadbalancer" {
 }
 
 resource "aws_lb_listener" "http-listener" {
-  load_balancer_arn = aws_lb.Applicatiom-loadbalancer.arn
+  load_balancer_arn = aws_lb.Application-LB.arn
   port              = "80"
   protocol          = "HTTP"
  default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb-target-group.arn
+    target_group_arn = aws_lb_target_group.lb-target-group-app.arn
   }
 }
 
 resource "aws_lb_listener" "ssh-listener" {
-  load_balancer_arn = aws_lb.Network-loadbalancer.arn
+  load_balancer_arn = aws_lb.Network-LB.arn
   port              = "22"
   protocol          = "TCP"
  default_action {
@@ -38,8 +38,8 @@ resource "aws_lb_listener" "ssh-listener" {
   }
 }
 
-resource "aws_lb_target_group" "lb-target-group" {
-  name     = "lb-target-group-${var.instance-name}"
+resource "aws_lb_target_group" "lb-target-group-app" {
+  name     = "Target-${var.instance-name}-app"
   port     = "${var.instance-port}"
   protocol = "HTTP"
   vpc_id   = var.main_vpc_id
@@ -59,8 +59,8 @@ resource "aws_lb_target_group" "lb-target-group" {
 
 
 resource "aws_lb_target_group" "lb-target-group-network" {
-  name     = "lb-target-${var.instance-name}-network"
-  port     = "${var.instance-port}"
+  name     = "Target-${var.instance-name}-network"
+  port     = "22"
   protocol = "TCP"
   vpc_id   = var.main_vpc_id
   target_type = "instance"
