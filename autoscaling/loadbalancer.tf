@@ -34,24 +34,36 @@ resource "aws_lb_listener" "ssh-listener" {
   protocol          = "TCP"
  default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb-target-group.arn
+    target_group_arn = aws_lb_target_group.lb-target-group-network.arn
   }
 }
 
 resource "aws_lb_target_group" "lb-target-group" {
   name     = "lb-target-group-${var.instance-name}"
   port     = "${var.instance-port}"
+  protocol = "HTTP"
+  vpc_id   = var.main_vpc_id
+  target_type = "instance"
+    health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    path              = "/"
+    interval            = 30
+    port = "${var.instance-port}"
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+resource "aws_lb_target_group" "lb-target-group-network" {
+  name     = "lb-target-${var.instance-name}-network"
+  port     = "${var.instance-port}"
   protocol = "TCP"
   vpc_id   = var.main_vpc_id
   target_type = "instance"
-  #   health_check {
-  #   healthy_threshold   = 2
-  #   unhealthy_threshold = 2
-  #   timeout             = 3
-  #   path              = "/"
-  #   interval            = 30
-  #   port = "${var.instance-port}"
-  # }
   lifecycle {
     create_before_destroy = true
   }
