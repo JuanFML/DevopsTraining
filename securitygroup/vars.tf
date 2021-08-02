@@ -1,7 +1,4 @@
-variable "instance-port"{
-  description = "port of the instance for the load balancer"
-  type = string
-}
+
 variable "security-group-name" {
   description = "name of the secuirty-group"
   type = string

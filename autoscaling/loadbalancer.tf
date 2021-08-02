@@ -57,7 +57,6 @@ resource "aws_lb_target_group" "lb-target-group-app" {
   }
 }
 
-
 resource "aws_lb_target_group" "lb-target-group-network" {
   name     = "Target-${var.instance-name}-network"
   port     = "22"

@@ -32,7 +32,6 @@ module "auto-scaling-frontend" {
   public-ip = true
   security-group = module.security-group-frontend.security-group-id
   lb-security-group = module.security-group-frontend.lb-security-group-id
-  network-lb-security-group = module.security-group-bastion.lb-security-group-id
 }
 
 module "auto-scaling-backend" {
@@ -47,7 +46,6 @@ module "auto-scaling-backend" {
   public-ip = false
   security-group = module.security-group-backend.security-group-id
   lb-security-group = module.security-group-backend.lb-security-group-id
-  network-lb-security-group = module.security-group-bastion.lb-security-group-id
 }
 
 module "security-group-frontend" {
@@ -55,7 +53,6 @@ module "security-group-frontend" {
   main_vpc_id = module.vpc_2n2.main_vpc_id
   security-group-name   = "Frontend-AS"
   security-group-lb-name   = "Frontend-LB"
-  instance-port    = 3000
   ingress-configs = {
     "http" = {
     from_port   = 80
@@ -108,22 +105,21 @@ module "security-group-backend" {
   main_vpc_id = module.vpc_2n2.main_vpc_id
   security-group-name   = "Backend-AS"
   security-group-lb-name   = "Backend-LB"
-  instance-port    = 8080
   ingress-configs = {
  "port" = {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = []
-    security_groups =["${module.security-group-frontend.security-group-id}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
     description = "NestJS app port access"
   },
   "ssh" = {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = []
-    security_groups =["${module.security-group-bastion.security-group-id}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
     description = "SSH port access"
   } 
   }
@@ -132,16 +128,17 @@ module "security-group-backend" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    security_groups =[]
+    cidr_blocks = []
+    security_groups =["${module.security-group-bastion.security-group-id}"]
     description = "App access through http"
   }
    "ssh" = {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    security_groups =[]
+    cidr_blocks = []
+    security_groups =["${module.security-group-bastion.security-group-id}"]
+    # "${module.security-group-bastion.security-group-id}"
     description = "Bastion host access"
   }
   }
@@ -150,7 +147,7 @@ module "security-group-backend" {
 module "Bastion-auto-scaling" {
   source           = "./autoscaling"
   AMI_id           = data.aws_ami.ubuntu.id
-  user_data64_file = ""
+  user_data64_file = "install_ansible.sh"
   subnets          = module.vpc_2n2.publicSubnets_ids
   main_vpc_id      = module.vpc_2n2.main_vpc_id
   internal-load-balancer = false
@@ -159,7 +156,6 @@ module "Bastion-auto-scaling" {
   public-ip = true
   security-group = module.security-group-bastion.security-group-id
   lb-security-group = module.security-group-bastion.lb-security-group-id
-  network-lb-security-group = module.security-group-bastion.lb-security-group-id
 }
 
 module "security-group-bastion" {
@@ -167,7 +163,6 @@ module "security-group-bastion" {
   main_vpc_id = module.vpc_2n2.main_vpc_id
   security-group-name   = "Bastion-AS"
   security-group-lb-name   = "Bastion-LB"
-  instance-port    = 80
   ingress-configs = {
     "ssh" = {
       from_port   = 22
