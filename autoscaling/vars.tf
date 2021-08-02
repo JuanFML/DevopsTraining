@@ -29,3 +29,6 @@ variable "security-group" {
 variable "lb-security-group" {
   description = "lb-security-group"
 }
+variable "network-lb-security-group" {
+  description = "lb-security-group"
+}

@@ -23,7 +23,7 @@ resource "aws_subnet" "publicSubnets" {
   }
 }
 
-#Create all public subnets
+#Create all private subnets
 resource "aws_subnet" "privateSubnets" {
   count = length(var.privateSubnets)
   vpc_id     = aws_vpc.Main.id
@@ -34,16 +34,6 @@ resource "aws_subnet" "privateSubnets" {
     Name = "private${count.index}"
   }
 }
-# #Create all private subnets
-# resource "aws_subnet" "privateSubnets" {
-#   vpc_id     = aws_vpc.Main.id
-#   for_each   = var.privateSubnets
-#   cidr_block = each.value
-#   tags = {
-#     Name = each.key
-#   }
-# }
-
 
 
 

@@ -20,7 +20,7 @@ module "vpc_2n2" {
   az = ["us-east-2a", "us-east-2b"]
 }
 
-module "auto-scaling-public" {
+module "auto-scaling-frontend" {
   source           = "./autoscaling"
   AMI_id           = data.aws_ami.ubuntu.id
   user_data64_file = "install_front.sh"
@@ -32,9 +32,10 @@ module "auto-scaling-public" {
   public-ip = true
   security-group = module.security-group-frontend.security-group-id
   lb-security-group = module.security-group-frontend.lb-security-group-id
+  network-lb-security-group = module.security-group-bastion.lb-security-group-id
 }
 
-module "auto-scaling-private" {
+module "auto-scaling-backend" {
   source         = "./autoscaling"
   AMI_id         = data.aws_ami.ubuntu.id
   user_data64_file = "install_back.sh"
@@ -46,12 +47,14 @@ module "auto-scaling-private" {
   public-ip = false
   security-group = module.security-group-backend.security-group-id
   lb-security-group = module.security-group-backend.lb-security-group-id
+  network-lb-security-group = module.security-group-bastion.lb-security-group-id
 }
 
 module "security-group-frontend" {
   source         = "./securitygroup"
   main_vpc_id = module.vpc_2n2.main_vpc_id
-  instance-name    = "frontend"
+  security-group-name   = "Frontend-AS"
+  security-group-lb-name   = "Frontend-LB"
   instance-port    = 3000
   ingress-configs = {
     "http" = {
@@ -77,15 +80,26 @@ module "security-group-frontend" {
     description = "React app port access"
   }
   }
+  ingress-lb-configs={
+    "http" = {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
+    description = "App access through http"
+  },
+  }
 }
 
 module "security-group-backend" {
   depends_on = [
-    module.security-group-frontend
+    module.security-group-frontend, module.security-group-bastion
   ]
   source         = "./securitygroup"
   main_vpc_id = module.vpc_2n2.main_vpc_id
-  instance-name    = "backend"
+  security-group-name   = "Backend-AS"
+  security-group-lb-name   = "Backend-LB"
   instance-port    = 8080
   ingress-configs = {
  "port" = {
@@ -95,5 +109,66 @@ module "security-group-backend" {
     cidr_blocks = []
     security_groups =["${module.security-group-frontend.security-group-id}"]
     description = "NestJS app port access"
+  },
+  "ssh" = {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = []
+    security_groups =["${module.security-group-bastion.security-group-id}"]
+    description = "SSH port access"
+  } 
+  }
+  ingress-lb-configs={
+  "http" = {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
+    description = "App access through http"
+  }
+  }
+}
+
+module "Bastion-auto-scaling" {
+  source           = "./autoscaling"
+  AMI_id           = data.aws_ami.ubuntu.id
+  user_data64_file = ""
+  subnets          = module.vpc_2n2.publicSubnets_ids
+  main_vpc_id      = module.vpc_2n2.main_vpc_id
+  internal-load-balancer = false
+  instance-name    = "Bastion-host"
+  instance-port    = 22
+  public-ip = true
+  security-group = module.security-group-bastion.security-group-id
+  lb-security-group = module.security-group-bastion.lb-security-group-id
+  network-lb-security-group = module.security-group-bastion.lb-security-group-id
+}
+
+module "security-group-bastion" {
+  source         = "./securitygroup"
+  main_vpc_id = module.vpc_2n2.main_vpc_id
+  security-group-name   = "Bastion-AS"
+  security-group-lb-name   = "Bastion-LB"
+  instance-port    = 80
+  ingress-configs = {
+ "ssh" = {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
+    description = "Bastion host access"
   }}
+  ingress-lb-configs={
+    "ssh" = {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_groups =[]
+    description = "App access through http"
+  }
+  }
 }
