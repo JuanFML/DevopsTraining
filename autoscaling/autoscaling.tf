@@ -2,7 +2,7 @@ resource "aws_launch_configuration" "config-autoscale-group" {
   name_prefix   = "config-autoscale-group${var.instance-name}"
   image_id      = var.AMI_id
   instance_type = "t2.micro"
-  user_data_base64 = "${filebase64(var.user_data64_file)}"
+  # user_data_base64 = "${filebase64(var.user_data64_file)}"
   security_groups = ["${var.security-group}"]
   associate_public_ip_address = var.public-ip
   key_name = "first-key-pair"
