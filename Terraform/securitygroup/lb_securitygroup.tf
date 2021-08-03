@@ -1,5 +1,5 @@
 resource "aws_security_group" "Allow-http" {
-  name = "${var.security-group-lb-name}"
+  name = var.security-group-lb-name
   vpc_id      = var.main_vpc_id
 
   dynamic "ingress" {

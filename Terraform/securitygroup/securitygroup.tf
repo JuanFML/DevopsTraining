@@ -1,5 +1,5 @@
 resource "aws_security_group" "Allow-http-ssh" {
-  name = "${var.security-group-name}"
+  name = var.security-group-name
   vpc_id      = var.main_vpc_id
 
   dynamic "ingress" {

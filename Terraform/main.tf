@@ -23,7 +23,7 @@ module "vpc_2n2" {
 module "auto-scaling-frontend" {
   source           = "./autoscaling"
   AMI_id           = data.aws_ami.ubuntu.id
-  user_data64_file = "install_front.sh"
+  user_data64_file = ""
   subnets          = module.vpc_2n2.publicSubnets_ids
   main_vpc_id      = module.vpc_2n2.main_vpc_id
   internal-load-balancer = false
@@ -37,7 +37,7 @@ module "auto-scaling-frontend" {
 module "auto-scaling-backend" {
   source         = "./autoscaling"
   AMI_id         = data.aws_ami.ubuntu.id
-  user_data64_file = "install_back.sh"
+  user_data64_file = ""
   subnets = module.vpc_2n2.privateSubnets_ids
   main_vpc_id = module.vpc_2n2.main_vpc_id
   internal-load-balancer = true
@@ -129,7 +129,7 @@ module "security-group-backend" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = []
-    security_groups =["${module.security-group-bastion.security-group-id}"]
+    security_groups =["${module.security-group-frontend.security-group-id}"]
     description = "App access through http"
   }
    "ssh" = {
@@ -147,7 +147,7 @@ module "security-group-backend" {
 module "Bastion-auto-scaling" {
   source           = "./autoscaling"
   AMI_id           = data.aws_ami.ubuntu.id
-  user_data64_file = "install_ansible.sh"
+  user_data64_file = ""
   subnets          = module.vpc_2n2.publicSubnets_ids
   main_vpc_id      = module.vpc_2n2.main_vpc_id
   internal-load-balancer = false
