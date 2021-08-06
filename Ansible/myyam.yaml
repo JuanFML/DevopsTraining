@@ -11,32 +11,37 @@
         upgrade: true
         update_cache: true
         cache_valid_time: 86400
-    - name: download node file
-      shell: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-    - name: install node
-      shell: sudo apt-get install -y nodejs
-    - name: install npm
-      shell: sudo npm install npm@latest -g
-    - name: delete folder
-      shell: rm -rf InterviewReactApp
-    - name: clone repository
-      shell: git clone https://github.com/JuanFML/InterviewReactApp.git
-    - name: install dependencies
-      shell: npm install
-      args:
-        chdir: InterviewReactApp/
+    - name: "Add nodejs apt key"
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+
+    - name: "Add nodejs 13.x ppa for apt repo"
+      apt_repository:
+        repo: deb https://deb.nodesource.com/node_13.x bionic main
+        update_cache: yes
+    - name: "Install nodejs"
+      apt:
+        update_cache: yes
+        name: nodejs
+        state: present
+    - name: Delete content & directory
+      file:
+        state: absent
+        path: /InterviewReactApp
+    - name: Clone a github repository
+      git:
+        repo: https://github.com/JuanFML/InterviewReactApp.git
+        # dest: /home/debian/repos/
+        clone: yes
+        update: yes
+    - name: Install packages based on package.json.
+      npm:
+        path: /InterviewReactApp
     - name: Install PM2
-      shell: npm install pm2 -g
-      args:
-        chdir: InterviewReactApp/
-    #  - name: Install serve
-    #   shell: npm install -g serve
-    #   args:
-    #     chdir: InterviewReactApp/
-    # - name: run build
-    #   shell: npm run build
-    #   args:
-    #     chdir: InterviewReactApp/
+      npm:
+        name: pm2
+        path: InterviewReactApp/
     - name: run app
       shell: pm2 start node_modules/react-scripts/scripts/start.js -- name "interview"
       args:
@@ -58,45 +63,42 @@
         upgrade: true
         update_cache: true
         cache_valid_time: 86400
-    - name: download node file
-      shell: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-    - name: install node
-      shell: sudo apt-get install -y nodejs
-    - name: install npm
-      shell: sudo npm install npm@latest -g
-    - name: delete folder
-      shell: rm -rf back-test
-    - name: clone repository
-      shell: git clone https://github.com/Isheros/back-test.git
-    - name: install dependencies
-    - name: install dependencies
-      shell: npm install
-      args:
-        chdir: back-test/
+    - name: "Add nodejs apt key"
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+
+    - name: "Add nodejs 13.x ppa for apt repo"
+      apt_repository:
+        repo: deb https://deb.nodesource.com/node_13.x bionic main
+        update_cache: yes
+    - name: "Install nodejs"
+      apt:
+        update_cache: yes
+        name: nodejs
+        state: present
+    - name: Delete content & directory
+      file:
+        state: absent
+        path: /back-test
+    - name: Clone a github repository
+      git:
+        repo: https://github.com/Isheros/back-test.git
+        # dest: /home/debian/repos/
+        clone: yes
+        update: yes
+    - name: Install packages based on package.json.
+      npm:
+        path: /back-test
     - name: Install PM2
-      shell: npm install pm2 -g
-      args:
-        chdir: back-test/
-    - name: run build
-      shell: npm run build
+      npm:
+        name: pm2
+        path: back-test/
+    - name: run app
+      shell: pm2 start node_modules/react-scripts/scripts/start.js -- name "interview"
       args:
         chdir: back-test/
     - name: run app
-      shell: pm2 start dist/main.js --name "back"
+      shell: pm2 serve build 3000 --name 'front'
       args:
-        chdir: back-test/
-
-    # - name: Install apache
-    #   apt:
-    #     name: apache2
-    #     state: latest
-    # - name: Start and enable apache2 service
-    #   systemd:
-    #     name: apache2
-    #     state: started
-    #     enabled: true
-    #     daemon_reload: true
-    # - name: create file
-    #   copy:
-    #     content: "<h1>Deployed via Terraform asj;dfkjas;</h1>"
-    #     dest: /var/www/html/index.html
+        chdir: back-test
