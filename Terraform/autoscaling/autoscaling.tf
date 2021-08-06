@@ -18,7 +18,10 @@ resource "aws_autoscaling_group" "group" {
   min_size             = 1
   max_size             = 1
   vpc_zone_identifier  = var.subnets
-  target_group_arns = [aws_lb_target_group.lb-target-group-app.arn, aws_lb_target_group.lb-target-group-network.arn]
+  # target_group_arns = [aws_lb_target_group.lb-target-group-app.arn, aws_lb_target_group.lb-target-group-network.arn]
+
+  load_balancers =  ["${aws_elb.classic-LB.name}"]
+
 
   lifecycle {
     create_before_destroy = true
