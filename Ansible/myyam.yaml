@@ -32,24 +32,28 @@
     - name: Clone a github repository
       git:
         repo: https://github.com/JuanFML/InterviewReactApp.git
-        # dest: /home/debian/repos/
+        dest: /InterviewReactApp
         clone: yes
         update: yes
+
     - name: Install packages based on package.json.
-      npm:
-        path: /InterviewReactApp
+      shell: npm install
+      args:
+        chdir: /InterviewReactApp
+
     - name: Install PM2
       npm:
         name: pm2
-        path: InterviewReactApp/
+        global: yes
+
     - name: run app
       shell: pm2 start node_modules/react-scripts/scripts/start.js -- name "interview"
       args:
-        chdir: InterviewReactApp/
+        chdir: /InterviewReactApp
     - name: run app
       shell: pm2 serve build 3000 --name 'front'
       args:
-        chdir: InterviewReactApp/
+        chdir: /InterviewReactApp
 
 - hosts: backend
 
@@ -84,21 +88,24 @@
     - name: Clone a github repository
       git:
         repo: https://github.com/Isheros/back-test.git
-        # dest: /home/debian/repos/
+        dest: /back-test
         clone: yes
         update: yes
+    # - name: Install packages based on package.json.
+    #   npm:
     - name: Install packages based on package.json.
-      npm:
-        path: /back-test
+      shell: npm install
+      args:
+        chdir: /back-test
     - name: Install PM2
       npm:
         name: pm2
-        path: back-test/
+        global: yes
     - name: run app
       shell: pm2 start node_modules/react-scripts/scripts/start.js -- name "interview"
       args:
-        chdir: back-test/
+        chdir: /back-test
     - name: run app
       shell: pm2 serve build 3000 --name 'front'
       args:
-        chdir: back-test
+        chdir: /back-test
