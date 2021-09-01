@@ -3,7 +3,7 @@ resource "aws_vpc" "Main" {
   cidr_block       = var.main_vpc_cidr
   instance_tenancy = "default"
 }
-#Create Internet Gateway 
+#Create Internet Gateway
 resource "aws_internet_gateway" "IGW" {
   vpc_id = aws_vpc.Main.id
 }

@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: 2010-09-09
+# This CloudFormation template deploys a basic VPC / Network.
+Resources:
+  # VPC
+  MainVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/22
+      InstanceTenancy: "default"
+      Tags:
+        - Key: Name
+          Value: "Main-VPC"
+
+  # Internet Gateway
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: MainVPC
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MainVPC
+      InternetGatewayId: !Ref IGW
+
+  # Public Subnet 1
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select [0, !GetAZs ] # Get the first AZ in the list
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Public-1
+
+  # Public Subnet 2
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [1, !GetAZs ] # Get the first AZ in the list
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Public-2
+
+  # Private Subnet 1
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [0, !GetAZs ] # Get the first AZ in the list
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Private-1
+
+  # Private Subnet 2
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: !Select [1, !GetAZs ] # Get the first AZ in the list
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Private-2
+
+  # Route tables:
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MainVPC
+      Tags:
+        - Key: Name
+          Value: Public
+  PublicRoute1: # Public route table has direct routing to IGW:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+
+  # Private route table:
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MainVPC
+      Tags:
+        - Key: Name
+          Value: Private
+  PrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      # Route traffic through the NAT Gateway:
+      NatGatewayId: !Ref NATGW
+
+  # Elastic IP for Nat
+  ElasticIPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: MainVPC
+
+  # A NAT Gateway:
+  NATGW:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIPAddress.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub NAT-${AWS::StackName}
+
+  # Attach Route tables to subnets
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+  PrivateSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+  PrivateSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+Outputs:
+  MainVPCOut:
+    Description: "MainVPC id"
+    Value: !Ref MainVPC
+    Export:
+      Name: "MainVPC-MainVPC-ID"
+  PublicSubnets:
+    Description: "Public1 id"
+    Value: !Join
+      - ","
+      - [!Ref PublicSubnet1, !Ref PublicSubnet2]
+    Export:
+      Name: "MainVPC-PublicSubnets"
+  PublicSubnet1Out:
+    Description: "Public1 id"
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: "MainVPC-PublicSubnet1-ID"
+  PublicSubnet2Out:
+    Description: "Public2 id"
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: "MainVPC-PublicSubnet2-ID"
+  PrivateSubnet1Out:
+    Description: "Private1 id"
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: "MainVPC-PrivateSubnet1-ID"
+  PrivateSubnet2Out:
+    Description: "Private2 id"
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: "MainVPC-PrivateSubnet2-ID"

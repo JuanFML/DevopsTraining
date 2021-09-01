@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: 2010-09-09
+# This CloudFormation template deploys a basic VPC / Network.
+Parameters:
+  LatestAmiId:
+    Description: Region specific image from the Parameter Store
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+  Subnets:
+    Type: CommaDelimitedList
+Resources:
+  LaunchConfigFront:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      AssociatePublicIpAddress: True
+      ImageId: !Ref LatestAmiId
+      InstanceType: t2.micro
+  AutoScalingGroupFront:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      MinSize: "1"
+      MaxSize: "1"
+      DesiredCapacity: "1"
+      LaunchConfigurationName: !Ref LaunchConfigFront
+      VPCZoneIdentifier: !Ref Subnets
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: true
+          Value: "SG-Front"

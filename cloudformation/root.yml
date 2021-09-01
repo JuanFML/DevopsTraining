@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: vpc.yml
+  AutoscalingFront:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - VPCStack
+    Properties:
+      TemplateURL: autoscaling.yml
+      Parameters:
+        Subnets: !GetAtt VPCStack.Outputs.PublicSubnets
